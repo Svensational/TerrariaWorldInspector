@@ -10,4 +10,8 @@ SOURCES += main.cpp \
 HEADERS += mainwindow.h \
            tworld.h
 
+OTHER_FILES += .gitignore \
+               LICENSE \
+               README.md
+
 CONFIG += c++11
