@@ -11,3 +11,11 @@
 *.lai
 *.la
 *.a
+
+# Qt stuff
+*.user
+Makefile
+*.Debug
+*.Release
+debug
+release
