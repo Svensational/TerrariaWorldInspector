@@ -21,6 +21,7 @@ private:
    QAction * saveAsAct;
 
    void initGUI();
+   void createCentralWidget();
 };
 
 #endif // MAINWINDOW_H

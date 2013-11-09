@@ -8,7 +8,10 @@ SOURCES += main.cpp \
            tworld.cpp
 
 HEADERS += mainwindow.h \
-           tworld.h
+           tworld.h \
+           luts.h
+
+RESOURCES += ressources.qrc
 
 OTHER_FILES += .gitignore \
                LICENSE \

@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="tree">icons/tree.png</file>
+        <file alias="tile">icons/tile.png</file>
+        <file alias="chest">icons/chest.png</file>
+    </qresource>
+</RCC>

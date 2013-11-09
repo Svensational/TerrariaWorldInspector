@@ -53,6 +53,31 @@ class TWorld {
       float windSpeed;
    };
 
+   struct Tile {
+      bool isActive;
+       quint8 tileType;
+        quint16 texU;
+        quint16 texV;
+       bool hasColor;
+        quint8 color;
+      bool hasWall;
+       quint8 wallType;
+       bool hasWallColor;
+        quint8 wallColor;
+      bool hasLiquid;
+       quint8 liquidAmount;
+       bool liquidIsLava;
+       bool liquidIsHoney;
+      bool hasWire1;
+      bool hasWire2;
+      bool hasWire3;
+      bool isHalfBrick;
+      quint8 slope; //???
+      bool actuator;
+      bool inActive;
+      quint16 rle;
+   };
+
 public:
    TWorld();
    bool isValid() const;
@@ -65,18 +90,22 @@ public:
 private:
    bool valid;
    Header header;
+   QList<Tile> tiles;
 
    inline void read(QPoint & point, QDataStream & in) const;
    inline void read(QRect & rect, QDataStream & in) const;
    inline void read(QSize & size, QDataStream & in) const;
    inline void read(QString & string, QDataStream & in) const;
    Header readHeader(QDataStream & in) const;
+   Tile readTile(QDataStream & in) const;
 
    inline void write(QPoint const & point, QDataStream & out) const;
    inline void write(QRect const & rect, QDataStream & out) const;
    inline void write(QSize const & size, QDataStream & out) const;
    inline void write(QString const & string, QDataStream & out) const;
    void writeHeader(Header const & header, QDataStream & out) const;
+
+   void debugOutput() const;
 };
 
 #endif // TWORLD_H

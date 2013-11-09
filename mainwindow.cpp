@@ -11,8 +11,24 @@ MainWindow::MainWindow(QWidget * parent) :
 MainWindow::~MainWindow() {
 }
 
+void MainWindow::createCentralWidget() {
+   QTabWidget * tabWidget = new QTabWidget();
+   tabWidget->setIconSize(QSize(32, 32));
+
+   QWidget * headerWidget = new QWidget();
+   tabWidget->addTab(headerWidget, QIcon(":/icons/tree"), "Header");
+
+   QWidget * tilesWidget = new QWidget();
+   tabWidget->addTab(tilesWidget, QIcon(":/icons/tile"), "Tiles");
+
+   QWidget * chestsWidget = new QWidget();
+   tabWidget->addTab(chestsWidget, QIcon(":/icons/chest"), "Chests");
+
+   setCentralWidget(tabWidget);
+}
+
 void MainWindow::initGUI() {
-   //setCentralWidget();
+   createCentralWidget();
 
    QToolBar * toolbar = addToolBar(tr("Toolbar"));
    QAction * openAct = new QAction(tr("&Open map"), this);

@@ -5,10 +5,30 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QFile>
 #include <QDebug>
+#include <QImage>
+#include "luts.h"
+
 
 TWorld::TWorld() :
    valid(false)
 {
+}
+
+void TWorld::debugOutput() const {
+   int i = 0;
+   QImage image(header.worldSize, QImage::Format_ARGB32);
+   foreach(Tile const & tile, tiles) {
+      int max = i+tile.rle+1;
+      for (; i<max; ++i) {
+         if (tile.isActive) {
+            image.setPixel(i/header.worldSize.height(), i%header.worldSize.height(), qRgb(255, 255, 255));
+         }
+         else {
+            image.setPixel(i/header.worldSize.height(), i%header.worldSize.height(), qRgb(0, 0, 0));
+         }
+      }
+   }
+   image.save("debug.png");
 }
 
 QString TWorld::getFolderName() {
@@ -47,6 +67,17 @@ bool TWorld::load(QString const & filename) {
 
    // load stuff
    header = readHeader(in);
+
+   tiles.clear();
+   int i = 0;
+   Tile tile;
+   while (i < header.worldSize.width() * header.worldSize.height()) {
+      tile = readTile(in);
+      tiles << tile;
+      i += tile.rle+1;
+   }
+
+   //debugOutput();
 
    file.close();
    valid = true;
@@ -143,6 +174,47 @@ TWorld::Header TWorld::readHeader(QDataStream & in) const {
    in >> header.windSpeed;
 
    return header;
+}
+
+TWorld::Tile TWorld::readTile(QDataStream & in) const {
+   Tile tile;
+
+   in >> tile.isActive;
+   if (tile.isActive) {
+      in >> tile.tileType;
+      if (tileLUT(tile.tileType).hasTexCoords) {
+         in >> tile.texU;
+         in >> tile.texV;
+      }
+      in >> tile.hasColor;
+      if (tile.hasColor) {
+         in >> tile.color;
+      }
+   }
+   in >> tile.hasWall;
+   if (tile.hasWall) {
+      in >> tile.wallType;
+      in >> tile.hasWallColor;
+      if (tile.hasWallColor) {
+         in >> tile.wallColor;
+      }
+   }
+   in >> tile.hasLiquid;
+   if (tile.hasLiquid) {
+      in >> tile.liquidAmount;
+      in >> tile.liquidIsLava;
+      in >> tile.liquidIsHoney;
+   }
+   in >> tile.hasWire1;
+   in >> tile.hasWire2;
+   in >> tile.hasWire3;
+   in >> tile.isHalfBrick;
+   in >> tile.slope;
+   in >> tile.actuator;
+   in >> tile.inActive;
+   in >> tile.rle;
+
+   return tile;
 }
 
 bool TWorld::save(QString const & filename) {
