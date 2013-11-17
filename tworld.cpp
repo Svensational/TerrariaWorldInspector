@@ -17,6 +17,7 @@ TWorld::TWorld() :
 void TWorld::debugOutput() const {
    int i = 0;
    QImage image(header.worldSize, QImage::Format_ARGB32);
+   image.fill(qRgb(0, 255, 0));
    foreach(Tile const & tile, tiles) {
       int max = i+tile.rle+1;
       for (; i<max; ++i) {
@@ -44,6 +45,10 @@ QString TWorld::getFolderName() {
    return folder;
 }
 
+TWorld::Header const & TWorld::getHeader() const {
+   return header;
+}
+
 QString TWorld::getName() const {
    if (isValid()) {
       return header.worldName;
@@ -65,9 +70,10 @@ bool TWorld::load(QString const & filename) {
    QDataStream in(&file);
    in.setByteOrder(QDataStream::LittleEndian);
 
-   // load stuff
+   // load header
    header = readHeader(in);
 
+   // load tiles
    tiles.clear();
    int i = 0;
    Tile tile;
@@ -77,11 +83,23 @@ bool TWorld::load(QString const & filename) {
       i += tile.rle+1;
    }
 
-   //debugOutput();
+   debugOutput();
 
    file.close();
    valid = true;
+   emit loaded();
    return true;
+}
+
+void TWorld::read(float & fp, QDataStream & in) const {
+   // fu you, Qt>=4.6, fu you hard!
+   in.setFloatingPointPrecision(QDataStream::SinglePrecision);
+   in >> fp;
+}
+
+void TWorld::read(double & fp, QDataStream & in) const {
+   in.setFloatingPointPrecision(QDataStream::DoublePrecision);
+   in >> fp;
 }
 
 void TWorld::read(QPoint & point, QDataStream & in) const {
@@ -138,9 +156,9 @@ TWorld::Header TWorld::readHeader(QDataStream & in) const {
    in >> header.jungleBackStyle;
    in >> header.hellBackStyle;
    read(header.spawnPoint, in);
-   in >> header.groundLevel;
-   in >> header.rockLevel;
-   in >> header.time;
+   read(header.groundLevel, in);
+   read(header.rockLevel, in);
+   read(header.time, in);
    in >> header.isDayTime;
    in >> header.moonPhase;
    in >> header.isBloodMoon;
@@ -161,17 +179,17 @@ TWorld::Header TWorld::readHeader(QDataStream & in) const {
    in >> header.invasionDelay;
    in >> header.invasionSize;
    in >> header.invasionType;
-   in >> header.invasionX;
+   read(header.invasionX, in);
    in >> header.isRaining;
    in >> header.rainTime;
-   in >> header.maxRain;
+   read(header.maxRain, in);
    for (int i=0; i<3; ++i)
       in >> header.oreTier[i];
    for (int i=0; i<8; ++i)
       in >> header.styles[i];
    in >> header.cloudsActive;
    in >> header.numClouds;
-   in >> header.windSpeed;
+   read(header.windSpeed, in);
 
    return header;
 }
@@ -230,6 +248,17 @@ bool TWorld::save(QString const & filename) {
 
    file.close();
    return true;
+}
+
+void TWorld::write(float const & fp, QDataStream & out) const {
+   // fu you, Qt>=4.6, fu you hard!
+   out.setFloatingPointPrecision(QDataStream::SinglePrecision);
+   out << fp;
+}
+
+void TWorld::write(double const & fp, QDataStream & out) const {
+   out.setFloatingPointPrecision(QDataStream::DoublePrecision);
+   out << fp;
 }
 
 void TWorld::write(QPoint const & point, QDataStream & out) const {

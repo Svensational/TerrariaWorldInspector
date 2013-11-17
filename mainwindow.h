@@ -2,7 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QtWidgets/QMainWindow>
-#include "tworld.h"
+
+class TWorld;
 
 class MainWindow : public QMainWindow {
 
@@ -17,7 +18,7 @@ private slots:
    void saveMapAs();
 
 private:
-   TWorld world;
+   TWorld * world;
    QAction * saveAsAct;
 
    void initGUI();

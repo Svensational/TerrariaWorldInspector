@@ -2,12 +2,16 @@
 #define TWORLD_H
 
 #include <array>
+#include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QRect>
 #include <QtCore/QString>
 
-class TWorld {
+class TWorld : public QObject {
 
+   Q_OBJECT
+
+public:
    struct Header {
       quint32 version;
       QString worldName;
@@ -44,7 +48,7 @@ class TWorld {
       quint32 invasionType;
       double invasionX;
       bool isRaining;
-      bool rainTime;
+      quint32 rainTime;
       float maxRain;
       std::array<quint32, 3> oreTier;
       std::array<quint8, 8> styles;
@@ -78,7 +82,6 @@ class TWorld {
       quint16 rle;
    };
 
-public:
    TWorld();
    bool isValid() const;
    bool load(QString const & filename);
@@ -86,12 +89,19 @@ public:
    QString getName() const;
 
    static QString getFolderName();
+   Header const & getHeader() const;
+
+signals:
+   void loaded();
 
 private:
    bool valid;
    Header header;
    QList<Tile> tiles;
 
+
+   inline void read(float & fp, QDataStream & in) const;
+   inline void read(double & fp, QDataStream & in) const;
    inline void read(QPoint & point, QDataStream & in) const;
    inline void read(QRect & rect, QDataStream & in) const;
    inline void read(QSize & size, QDataStream & in) const;
@@ -99,6 +109,8 @@ private:
    Header readHeader(QDataStream & in) const;
    Tile readTile(QDataStream & in) const;
 
+   inline void write(float const & fp, QDataStream & out) const;
+   inline void write(double const & fp, QDataStream & out) const;
    inline void write(QPoint const & point, QDataStream & out) const;
    inline void write(QRect const & rect, QDataStream & out) const;
    inline void write(QSize const & size, QDataStream & out) const;

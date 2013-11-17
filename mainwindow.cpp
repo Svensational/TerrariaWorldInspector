@@ -1,22 +1,27 @@
 #include "mainwindow.h"
 #include <QtWidgets>
 #include "tworld.h"
+#include "headerwidget.h"
 
 MainWindow::MainWindow(QWidget * parent) :
    QMainWindow(parent)
 {
+   world = new TWorld();
    initGUI();
 }
 
 MainWindow::~MainWindow() {
+   delete world;
 }
 
 void MainWindow::createCentralWidget() {
    QTabWidget * tabWidget = new QTabWidget();
    tabWidget->setIconSize(QSize(32, 32));
 
-   QWidget * headerWidget = new QWidget();
-   tabWidget->addTab(headerWidget, QIcon(":/icons/tree"), "Header");
+   QScrollArea * headerScroll = new QScrollArea();
+   HeaderWidget * headerWidget = new HeaderWidget(world);
+   headerScroll->setWidget(headerWidget);
+   tabWidget->addTab(headerScroll, QIcon(":/icons/tree"), "Header");
 
    QWidget * tilesWidget = new QWidget();
    tabWidget->addTab(tilesWidget, QIcon(":/icons/tile"), "Tiles");
@@ -51,8 +56,8 @@ void MainWindow::loadMap() {
    if (filename.isNull()) {
       return;
    }
-   if (world.load(filename)) {
-      setWindowTitle(world.getName() + " - TWI v0.9");
+   if (world->load(filename)) {
+      setWindowTitle(world->getName() + " - TWI v0.9");
       saveAsAct->setEnabled(true);
    }
 }
@@ -63,5 +68,5 @@ void MainWindow::saveMapAs() {
       return;
    }
 
-   world.save(filename);
+   world->save(filename);
 }

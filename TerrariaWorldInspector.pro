@@ -5,11 +5,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
            mainwindow.cpp \
-           tworld.cpp
+           tworld.cpp \
+           headerwidget.cpp
 
 HEADERS += mainwindow.h \
            tworld.h \
-           luts.h
+           luts.h \
+           headerwidget.h
 
 RESOURCES += ressources.qrc
 
