@@ -77,7 +77,7 @@ public:
       bool hasWire2;
       bool hasWire3;
       bool isHalfBrick;
-      quint8 slope; //???
+      quint8 slope;
       bool actuator;
       bool inActive;
       quint16 rle;
@@ -150,13 +150,22 @@ private:
    Sign readSign(QDataStream & in) const;
    NPC readNPC(QDataStream & in) const;
 
-   inline void write(float const & fp, QDataStream & out) const;
-   inline void write(double const & fp, QDataStream & out) const;
+   inline void write(bool b, QDataStream & out) const;
+   inline void write(quint8 i, QDataStream & out) const;
+   inline void write(quint16 i, QDataStream & out) const;
+   inline void write(quint32 i, QDataStream & out) const;
+   inline void write(float fp, QDataStream & out) const;
+   inline void write(double fp, QDataStream & out) const;
    inline void write(QPoint const & point, QDataStream & out) const;
-   inline void write(QRect const & rect, QDataStream & out) const;
+   inline void write(QPointF const & point, QDataStream & out) const;
    inline void write(QSize const & size, QDataStream & out) const;
+   inline void write(QRect const & rect, QDataStream & out) const;
    inline void write(QString const & string, QDataStream & out) const;
-   void writeHeader(Header const & header, QDataStream & out) const;
+   void write(Header const & header, QDataStream & out) const;
+   void write(Tile const & tile, QDataStream & out) const;
+   void write(Chest const & chest, QDataStream & out) const;
+   void write(Sign const & sign, QDataStream & out) const;
+   void write(NPC const & npc, QDataStream & out) const;
 
    void debugOutput() const;
 };

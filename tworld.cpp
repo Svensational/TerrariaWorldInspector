@@ -4,7 +4,6 @@
 #endif
 #include <QtCore/QDataStream>
 #include <QtCore/QFile>
-#include <QDebug>
 #include <QImage>
 #include "luts.h"
 
@@ -131,8 +130,8 @@ bool TWorld::load(QString const & filename) {
 
    // validate
    if (!readBool(in) || readString(in)!=header.worldName || readUInt32(in)!=header.worldID) {
-      qDebug() << "Failed!";
-      //debugOutput();
+      file.close();
+      return (valid = false);
    }
 
    file.close();
@@ -259,7 +258,10 @@ QPoint TWorld::readPoint(QDataStream & in) const {
 }
 
 QPointF TWorld::readPointF(QDataStream & in) const {
-   return QPoint(readFloat(in), readFloat(in));
+   QPoint point;
+   point.setX(readFloat(in));
+   point.setY(readFloat(in));
+   return point;
 }
 
 QRect TWorld::readRect(QDataStream & in) const {
@@ -361,25 +363,149 @@ bool TWorld::save(QString const & filename) {
    QDataStream out(&file);
    out.setByteOrder(QDataStream::LittleEndian);
 
-   // save stuff
-   writeHeader(header, out);
+   // write header
+   write(header, out);
+
+   // write tiles
+   foreach(Tile const & tile, tiles) {
+      write(tile, out);
+   }
+
+   // write chests
+   foreach(Chest const & chest, chests) {
+      write(chest, out);
+   }
+   for (int i=chests.size(); i<1000; ++i) {
+      write(false, out);
+   }
+
+   // write signs
+   foreach(Sign const & sign, signs) {
+      write(sign, out);
+   }
+   for (int i=signs.size(); i<1000; ++i) {
+      write(false, out);
+   }
+
+   // write NPCs
+   foreach(NPC const & npc, npcs) {
+      write(npc, out);
+   }
+   write(false, out);
+   foreach(QString const & name, npcNames) {
+      write(name, out);
+   }
+
+   // write file ending
+   write(true, out);
+   write(header.worldName, out);
+   write(header.worldID, out);
 
    file.close();
    return true;
 }
 
-void TWorld::write(float const & fp, QDataStream & out) const {
+void TWorld::write(bool b, QDataStream & out) const {
+   out << b;
+}
+
+void TWorld::write(Chest const & chest, QDataStream & out) const {
+   write(chest.isValid, out);
+   if (chest.isValid) {
+      write(chest.position, out);
+      foreach (Chest::Item const & item, chest.items) {
+         write(item.amount, out);
+         if (item.amount) {
+            write(item.id, out);
+            write(item.modifierID, out);
+         }
+      }
+   }
+}
+
+void TWorld::write(double fp, QDataStream & out) const {
+   out.setFloatingPointPrecision(QDataStream::DoublePrecision);
+   out << fp;
+}
+
+void TWorld::write(float fp, QDataStream & out) const {
    // fu you, Qt>=4.6, fu you hard!
    out.setFloatingPointPrecision(QDataStream::SinglePrecision);
    out << fp;
 }
 
-void TWorld::write(double const & fp, QDataStream & out) const {
-   out.setFloatingPointPrecision(QDataStream::DoublePrecision);
-   out << fp;
+void TWorld::write(Header const & header, QDataStream & out) const {
+   write(header.version, out);
+   write(header.worldName, out);
+   write(header.worldID, out);
+   write(header.worldBounds, out);
+   write(header.worldSize, out);
+   write(header.moonType, out);
+   for (int i=0; i<3; ++i)
+      write(header.treeX[i], out);
+   for (int i=0; i<4; ++i)
+      write(header.treeStyle[i], out);
+   for (int i=0; i<3; ++i)
+      write(header.caveBackX[i], out);
+   for (int i=0; i<4; ++i)
+      write(header.caveBackStyle[i], out);
+   write(header.iceBackStyle, out);
+   write(header.jungleBackStyle, out);
+   write(header.hellBackStyle, out);
+   write(header.spawnPoint, out);
+   write(header.groundLevel, out);
+   write(header.rockLevel, out);
+   write(header.time, out);
+   write(header.isDayTime, out);
+   write(header.moonPhase, out);
+   write(header.isBloodMoon, out);
+   write(header.isEclipse, out);
+   write(header.dungeonPoint, out);
+   write(header.isCrimson, out);
+   for (int i=0; i<10; ++i)
+      write(header.isDefeated[i], out);
+   for (int i=0; i<3; ++i)
+      write(header.isSaved[i], out);
+   for (int i=10; i<14; ++i)
+      write(header.isDefeated[i], out);
+   write(header.isShadowOrbSmashed, out);
+   write(header.isMeteorSpawned, out);
+   write(header.numShadowOrbs, out);
+   write(header.altarCount, out);
+   write(header.isHardMode, out);
+   write(header.invasionDelay, out);
+   write(header.invasionSize, out);
+   write(header.invasionType, out);
+   write(header.invasionX, out);
+   write(header.isRaining, out);
+   write(header.rainTime, out);
+   write(header.maxRain, out);
+   for (int i=0; i<3; ++i)
+      write(header.oreTier[i], out);
+   for (int i=0; i<8; ++i)
+      write(header.styles[i], out);
+   write(header.cloudsActive, out);
+   write(header.numClouds, out);
+   write(header.windSpeed, out);
+}
+
+void TWorld::write(NPC const & npc, QDataStream & out) const {
+   write(npc.isValid, out);
+   if (npc.isValid) {
+      write(npc.job, out);
+      write(npc.position, out);
+      write(npc.isHomeless, out);
+      write(npc.homePos, out);
+   }
 }
 
 void TWorld::write(QPoint const & point, QDataStream & out) const {
+   out << point.x();
+   out << point.y();
+}
+
+void TWorld::write(QPointF const & point, QDataStream & out) const {
+   out.setFloatingPointPrecision(QDataStream::SinglePrecision);
    out << point.x();
    out << point.y();
 }
@@ -389,6 +515,14 @@ void TWorld::write(QRect const & rect, QDataStream & out) const {
    out << rect.right();
    out << rect.top();
    out << rect.bottom();
+}
+
+void TWorld::write(Sign const & sign, QDataStream & out) const {
+   write(sign.isValid, out);
+   if (sign.isValid) {
+      write(sign.text, out);
+      write(sign.position, out);
+   }
 }
 
 void TWorld::write(QSize const & size, QDataStream & out) const {
@@ -403,57 +537,51 @@ void TWorld::write(QString const & string, QDataStream & out) const {
    }
 }
 
-void TWorld::writeHeader(Header const & header, QDataStream & out) const {
-   out << header.version;
-   write(header.worldName, out);
-   out << header.worldID;
-   write(header.worldBounds, out);
-   write(header.worldSize, out);
-   out << header.moonType;
-   for (int i=0; i<3; ++i)
-      out << header.treeX[i];
-   for (int i=0; i<4; ++i)
-      out << header.treeStyle[i];
-   for (int i=0; i<3; ++i)
-      out << header.caveBackX[i];
-   for (int i=0; i<4; ++i)
-      out << header.caveBackStyle[i];
-   out << header.iceBackStyle;
-   out << header.jungleBackStyle;
-   out << header.hellBackStyle;
-   write(header.spawnPoint, out);
-   out << header.groundLevel;
-   out << header.rockLevel;
-   out << header.time;
-   out << header.isDayTime;
-   out << header.moonPhase;
-   out << header.isBloodMoon;
-   out << header.isEclipse;
-   write(header.dungeonPoint, out);
-   out << header.isCrimson;
-   for (int i=0; i<10; ++i)
-      out << header.isDefeated[i];
-   for (int i=0; i<3; ++i)
-      out << header.isSaved[i];
-   for (int i=10; i<14; ++i)
-      out << header.isDefeated[i];
-   out << header.isShadowOrbSmashed;
-   out << header.isMeteorSpawned;
-   out << header.numShadowOrbs;
-   out << header.altarCount;
-   out << header.isHardMode;
-   out << header.invasionDelay;
-   out << header.invasionSize;
-   out << header.invasionType;
-   out << header.invasionX;
-   out << header.isRaining;
-   out << header.rainTime;
-   out << header.maxRain;
-   for (int i=0; i<3; ++i)
-      out << header.oreTier[i];
-   for (int i=0; i<8; ++i)
-      out << header.styles[i];
-   out << header.cloudsActive;
-   out << header.numClouds;
-   out << header.windSpeed;
+void TWorld::write(Tile const & tile, QDataStream & out) const {
+   write(tile.isActive, out);
+   if (tile.isActive) {
+      write(tile.tileType, out);
+      if (tileLUT(tile.tileType).hasTexCoords) {
+         write(tile.texU, out);
+         write(tile.texV, out);
+      }
+      write(tile.hasColor, out);
+      if (tile.hasColor) {
+         write(tile.color, out);
+      }
+   }
+   write(tile.hasWall, out);
+   if (tile.hasWall) {
+      write(tile.wallType, out);
+      write(tile.hasWallColor, out);
+      if (tile.hasWallColor) {
+         write(tile.wallColor, out);
+      }
+   }
+   write(tile.hasLiquid, out);
+   if (tile.hasLiquid) {
+      write(tile.liquidAmount, out);
+      write(tile.liquidIsLava, out);
+      write(tile.liquidIsHoney, out);
+   }
+   write(tile.hasWire1, out);
+   write(tile.hasWire2, out);
+   write(tile.hasWire3, out);
+   write(tile.isHalfBrick, out);
+   write(tile.slope, out);
+   write(tile.actuator, out);
+   write(tile.inActive, out);
+   write(tile.rle, out);
+}
+
+void TWorld::write(quint8 i, QDataStream & out) const {
+   out << i;
+}
+
+void TWorld::write(quint16 i, QDataStream & out) const {
+   out << i;
+}
+
+void TWorld::write(quint32 i, QDataStream & out) const {
+   out << i;
 }
