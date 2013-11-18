@@ -28,6 +28,7 @@ void HeaderWidget::initGUI() {
    layout->addRow("Size", worldSize);
 
    moonType = new QSpinBox();
+   ///@todo determine amount of moon types
    layout->addRow("Moon type", moonType);
 
    treeX = new QLabel();
@@ -43,12 +44,15 @@ void HeaderWidget::initGUI() {
    layout->addRow("Cave Back Style", caveBackStyle);
 
    iceBackStyle = new QSpinBox();
+   ///@todo determine amount of back styles
    layout->addRow("Ice back style", iceBackStyle);
 
    jungleBackStyle = new QSpinBox();
+   ///@todo determine amount of back styles
    layout->addRow("Jungle back style", jungleBackStyle);
 
    hellBackStyle = new QSpinBox();
+   ///@todo determine amount of back styles
    layout->addRow("Hell back style", hellBackStyle);
 
    spawnPoint = new QLabel; //quint32
@@ -64,12 +68,14 @@ void HeaderWidget::initGUI() {
 
    time = new QDoubleSpinBox;
    time->setRange(0.0, 90000.0);
+   ///@todo present time in a nicer way (no raw data)
    layout->addRow("Time", time);
 
    isDayTime = new QCheckBox;
    layout->addRow("Day time", isDayTime);
 
    moonPhase = new QSpinBox();
+   ///@todo determine amount of moon phases
    layout->addRow("Moon phase", moonPhase);
 
    isBloodMoon = new QCheckBox;
@@ -88,59 +94,75 @@ void HeaderWidget::initGUI() {
    //std::array<bool, 3> isSaved;
 
    isShadowOrbSmashed = new QCheckBox;
-   layout->addRow("Shadow orb smashed", isShadowOrbSmashed);
+   layout->addRow("Shadow Orb destroyed", isShadowOrbSmashed);
 
    isMeteorSpawned = new QCheckBox;
    layout->addRow("Meteor spawned", isMeteorSpawned);
 
    numShadowOrbs = new QSpinBox();
-   layout->addRow("Shadow orbs smashed", numShadowOrbs);
+   numShadowOrbs->setRange(0, 50);
+   layout->addRow("Shadow Orbs destroyed", numShadowOrbs);
 
    altarCount = new QSpinBox();
-   layout->addRow("Altars", altarCount);
+   altarCount->setRange(0, 50);
+   layout->addRow("Altars destroyed", altarCount);
 
    isHardMode = new QCheckBox;
    layout->addRow("Hard mode", isHardMode);
 
    invasionDelay = new QSpinBox();
+   ///@todo determin range
    layout->addRow("Invasion delay", invasionDelay);
 
    invasionSize = new QSpinBox();
+   ///@todo determin range
    layout->addRow("Invasion size", invasionSize);
 
    invasionType = new QSpinBox();
+   ///@todo determin range
    layout->addRow("Invasion type", invasionType);
 
    invasionX = new QDoubleSpinBox;
+   invasionX->setRange(0, 8400);
    layout->addRow("Invasion X", invasionX);
 
    isRaining = new QCheckBox;
    layout->addRow("Raining", isRaining);
 
    rainTime = new QSpinBox();
+   ///@todo determin range
    layout->addRow("Rain time", rainTime);
 
    maxRain = new QDoubleSpinBox;
+   ///@todo determin range
    layout->addRow("Max rain", maxRain);
 
    oreTier1 = new QSpinBox();
+   ///@todo determin range
    layout->addRow("Ore tier 1", oreTier1);
 
    oreTier2 = new QSpinBox();
+   ///@todo determin range
    layout->addRow("Ore tier 2", oreTier2);
 
    oreTier3 = new QSpinBox();
+   ///@todo determin range
    layout->addRow("Ore tier 3", oreTier3);
 
    //std::array<quint8, 8> styles;
 
    cloudsActive = new QSpinBox();
+   ///@todo determin range
    layout->addRow("Clouds active", cloudsActive);
 
    numClouds = new QSpinBox();
+   ///@todo determin range
    layout->addRow("Number of clouds", numClouds);
 
    windSpeed = new QDoubleSpinBox;
+   ///@todo determin range
+   windSpeed->setRange(-1.0, 1.0);
+   windSpeed->setDecimals(5);
    layout->addRow("Wind speed", windSpeed);
 
    setLayout(layout);

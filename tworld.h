@@ -6,6 +6,7 @@
 #include <QtCore/QList>
 #include <QtCore/QRect>
 #include <QtCore/QString>
+#include <QtCore/QVector>
 
 class TWorld : public QObject {
 
@@ -82,6 +83,35 @@ public:
       quint16 rle;
    };
 
+   struct Chest {
+      struct Item {
+         quint16 amount;
+          quint32 id;
+          quint8 modifierID;
+         Item();
+      };
+
+      bool isValid;
+       QPoint position;
+       QVector<Item> items;
+      Chest();
+   };
+
+   struct Sign {
+      bool isValid;
+       QString text;
+       QPoint position;
+      Sign();
+   };
+
+   struct NPC {
+      bool isValid;
+       QString job;
+       QPointF position;
+       bool isHomeless;
+       QPoint homePos;
+   };
+
    TWorld();
    bool isValid() const;
    bool load(QString const & filename);
@@ -98,16 +128,27 @@ private:
    bool valid;
    Header header;
    QList<Tile> tiles;
+   QList<Chest> chests;
+   QList<Sign> signs;
+   QList<NPC> npcs;
+   QList<QString> npcNames;
 
-
-   inline void read(float & fp, QDataStream & in) const;
-   inline void read(double & fp, QDataStream & in) const;
-   inline void read(QPoint & point, QDataStream & in) const;
-   inline void read(QRect & rect, QDataStream & in) const;
-   inline void read(QSize & size, QDataStream & in) const;
-   inline void read(QString & string, QDataStream & in) const;
+   inline bool readBool(QDataStream & in) const;
+   inline quint8 readUInt8(QDataStream & in) const;
+   inline quint16 readUInt16(QDataStream & in) const;
+   inline quint32 readUInt32(QDataStream & in) const;
+   inline float readFloat(QDataStream & in) const;
+   inline double readDouble(QDataStream & in) const;
+   inline QPoint readPoint(QDataStream & in) const;
+   inline QPointF readPointF(QDataStream & in) const;
+   inline QSize readSize(QDataStream & in) const;
+   inline QRect readRect(QDataStream & in) const;
+   inline QString readString(QDataStream & in) const;
    Header readHeader(QDataStream & in) const;
    Tile readTile(QDataStream & in) const;
+   Chest readChest(QDataStream & in) const;
+   Sign readSign(QDataStream & in) const;
+   NPC readNPC(QDataStream & in) const;
 
    inline void write(float const & fp, QDataStream & out) const;
    inline void write(double const & fp, QDataStream & out) const;

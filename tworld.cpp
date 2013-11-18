@@ -8,6 +8,20 @@
 #include <QImage>
 #include "luts.h"
 
+TWorld::Chest::Item::Item() :
+   amount(0), id(0), modifierID(0)
+{
+}
+
+TWorld::Chest::Chest() :
+   isValid(false)
+{
+}
+
+TWorld::Sign::Sign() :
+   isValid(false)
+{
+}
 
 TWorld::TWorld() :
    valid(false)
@@ -83,156 +97,260 @@ bool TWorld::load(QString const & filename) {
       i += tile.rle+1;
    }
 
-   debugOutput();
+   // load chests
+   Chest chest;
+   chests.clear();
+   for (i=0; i<1000; ++i) {
+      chest = readChest(in);
+      if (chest.isValid) {
+         chests << chest;
+      }
+   }
+
+   // load signs
+   Sign sign;
+   signs.clear();
+   for (i=0; i<1000; ++i) {
+      sign = readSign(in);
+      if (sign.isValid) {
+         signs << sign;
+      }
+   }
+
+   // load NPCs
+   NPC npc = readNPC(in);
+   npcs.clear();
+   while (npc.isValid) {
+      npcs << npc;
+      npc = readNPC(in);
+   }
+   npcNames.clear();
+   for (i=0; i<18; ++i) {
+      npcNames << readString(in);
+   }
+
+   // validate
+   if (!readBool(in) || readString(in)!=header.worldName || readUInt32(in)!=header.worldID) {
+      qDebug() << "Failed!";
+      //debugOutput();
+   }
 
    file.close();
-   valid = true;
    emit loaded();
-   return true;
+   return (valid = true);
 }
 
-void TWorld::read(float & fp, QDataStream & in) const {
+bool TWorld::readBool(QDataStream & in) const {
+   bool b;
+   in >> b;
+   return b;
+}
+
+TWorld::Chest TWorld::readChest(QDataStream & in) const {
+   Chest chest;
+
+   if ((chest.isValid = readBool(in))) {
+      chest.position = readPoint(in);
+      chest.items.resize(40);
+      for (int i=0; i<40; ++i) {
+         if ((chest.items[i].amount = readUInt16(in))) {
+            chest.items[i].id = readUInt32(in);
+            chest.items[i].modifierID = readUInt8(in);
+         }
+      }
+   }
+
+   return chest;
+}
+
+double TWorld::readDouble(QDataStream & in) const {
+   float fp;
+   // fu you, Qt>=4.6, fu you hard!
+   in.setFloatingPointPrecision(QDataStream::DoublePrecision);
+   in >> fp;
+   return fp;
+}
+
+float TWorld::readFloat(QDataStream & in) const {
+   float fp;
    // fu you, Qt>=4.6, fu you hard!
    in.setFloatingPointPrecision(QDataStream::SinglePrecision);
    in >> fp;
-}
-
-void TWorld::read(double & fp, QDataStream & in) const {
-   in.setFloatingPointPrecision(QDataStream::DoublePrecision);
-   in >> fp;
-}
-
-void TWorld::read(QPoint & point, QDataStream & in) const {
-   in >> point.rx();
-   in >> point.ry();
-}
-
-void TWorld::read(QRect & rect, QDataStream & in) const {
-   quint32 temp;
-   in >> temp;
-   rect.setLeft(temp);
-   in >> temp;
-   rect.setRight(temp);
-   in >> temp;
-   rect.setTop(temp);
-   in >> temp;
-   rect.setBottom(temp);
-}
-
-void TWorld::read(QSize & size, QDataStream & in) const {
-   in >> size.rheight();
-   in >> size.rwidth();
-}
-
-void TWorld::read(QString & string, QDataStream & in) const {
-   string = QString("");
-   quint8 nameLength;
-   in >> nameLength;
-   quint8 tempChar;
-   for(quint8 i=0; i<nameLength; ++i) {
-      in >> tempChar;
-      string.append(QChar(tempChar));
-   }
+   return fp;
 }
 
 TWorld::Header TWorld::readHeader(QDataStream & in) const {
    Header header;
 
-   in >> header.version;
-   read(header.worldName, in);
-   in >> header.worldID;
-   read(header.worldBounds, in);
-   read(header.worldSize, in);
-   in >> header.moonType;
+   header.version = readUInt32(in);
+   header.worldName = readString(in);
+   header.worldID = readUInt32(in);
+   header.worldBounds = readRect(in);
+   header.worldSize = readSize(in);
+   header.moonType = readUInt8(in);
    for (int i=0; i<3; ++i)
-      in >> header.treeX[i];
+      header.treeX[i] = readUInt32(in);
    for (int i=0; i<4; ++i)
-      in >> header.treeStyle[i];
+      header.treeStyle[i] = readUInt32(in);
    for (int i=0; i<3; ++i)
-      in >> header.caveBackX[i];
+      header.caveBackX[i] = readUInt32(in);
    for (int i=0; i<4; ++i)
-      in >> header.caveBackStyle[i];
-   in >> header.iceBackStyle;
-   in >> header.jungleBackStyle;
-   in >> header.hellBackStyle;
-   read(header.spawnPoint, in);
-   read(header.groundLevel, in);
-   read(header.rockLevel, in);
-   read(header.time, in);
-   in >> header.isDayTime;
-   in >> header.moonPhase;
-   in >> header.isBloodMoon;
-   in >> header.isEclipse;
-   read(header.dungeonPoint, in);
-   in >> header.isCrimson;
+      header.caveBackStyle[i] = readUInt32(in);
+   header.iceBackStyle = readUInt32(in);
+   header.jungleBackStyle = readUInt32(in);
+   header.hellBackStyle = readUInt32(in);
+   header.spawnPoint = readPoint(in);
+   header.groundLevel = readDouble(in);
+   header.rockLevel = readDouble(in);
+   header.time = readDouble(in);
+   header.isDayTime = readBool(in);
+   header.moonPhase = readUInt32(in);
+   header.isBloodMoon = readBool(in);
+   header.isEclipse = readBool(in);
+   header.dungeonPoint = readPoint(in);
+   header.isCrimson = readBool(in);
    for (int i=0; i<10; ++i)
-      in >> header.isDefeated[i];
+      header.isDefeated[i] = readBool(in);
    for (int i=0; i<3; ++i)
-      in >> header.isSaved[i];
+      header.isSaved[i] = readBool(in);
    for (int i=10; i<14; ++i)
-      in >> header.isDefeated[i];
-   in >> header.isShadowOrbSmashed;
-   in >> header.isMeteorSpawned;
-   in >> header.numShadowOrbs;
-   in >> header.altarCount;
-   in >> header.isHardMode;
-   in >> header.invasionDelay;
-   in >> header.invasionSize;
-   in >> header.invasionType;
-   read(header.invasionX, in);
-   in >> header.isRaining;
-   in >> header.rainTime;
-   read(header.maxRain, in);
+      header.isDefeated[i] = readBool(in);
+   header.isShadowOrbSmashed = readBool(in);
+   header.isMeteorSpawned = readBool(in);
+   header.numShadowOrbs = readUInt8(in);
+   header.altarCount = readUInt32(in);
+   header.isHardMode = readBool(in);
+   header.invasionDelay = readUInt32(in);
+   header.invasionSize = readUInt32(in);
+   header.invasionType = readUInt32(in);
+   header.invasionX = readDouble(in);
+   header.isRaining = readBool(in);
+   header.rainTime = readUInt32(in);
+   header.maxRain = readFloat(in);
    for (int i=0; i<3; ++i)
-      in >> header.oreTier[i];
+      header.oreTier[i] = readUInt32(in);
    for (int i=0; i<8; ++i)
-      in >> header.styles[i];
-   in >> header.cloudsActive;
-   in >> header.numClouds;
-   read(header.windSpeed, in);
+      header.styles[i] = readUInt8(in);
+   header.cloudsActive = readUInt32(in);
+   header.numClouds = readUInt16(in);
+   header.windSpeed = readFloat(in);
 
    return header;
+}
+
+TWorld::NPC TWorld::readNPC(QDataStream & in) const {
+   NPC npc;
+
+   if ((npc.isValid = readBool(in))) {
+      npc.job = readString(in);
+      npc.position = readPointF(in);
+      npc.isHomeless = readBool(in);
+      npc.homePos = readPoint(in);
+   }
+
+   return npc;
+}
+
+QPoint TWorld::readPoint(QDataStream & in) const {
+   int x, y;
+   in >> x;
+   in >> y;
+   return QPoint(x, y);
+}
+
+QPointF TWorld::readPointF(QDataStream & in) const {
+   return QPoint(readFloat(in), readFloat(in));
+}
+
+QRect TWorld::readRect(QDataStream & in) const {
+   QRect rect;
+   rect.setLeft(readUInt32(in));
+   rect.setRight(readUInt32(in));
+   rect.setTop(readUInt32(in));
+   rect.setBottom(readUInt32(in));
+   return rect;
+}
+
+TWorld::Sign TWorld::readSign(QDataStream & in) const {
+   Sign sign;
+
+   if ((sign.isValid = readBool(in))) {
+      sign.text = readString(in);
+      sign.position = readPoint(in);
+   }
+
+   return sign;
+}
+
+QSize TWorld::readSize(QDataStream & in) const {
+   int width, height;
+   // strange, but correct
+   in >> height;
+   in >> width;
+   return QSize(width, height);
+}
+
+QString TWorld::readString(QDataStream & in) const {
+   QString string("");
+   const quint8 length = readUInt8(in);
+   for(quint8 i=0; i<length; ++i) {
+      string.append(QChar(readUInt8(in)));
+   }
+   return string;
 }
 
 TWorld::Tile TWorld::readTile(QDataStream & in) const {
    Tile tile;
 
-   in >> tile.isActive;
-   if (tile.isActive) {
-      in >> tile.tileType;
+   if ((tile.isActive = readBool(in))) {
+      tile.tileType = readUInt8(in);
       if (tileLUT(tile.tileType).hasTexCoords) {
-         in >> tile.texU;
-         in >> tile.texV;
+         tile.texU = readUInt16(in);
+         tile.texV = readUInt16(in);
       }
-      in >> tile.hasColor;
-      if (tile.hasColor) {
-         in >> tile.color;
-      }
-   }
-   in >> tile.hasWall;
-   if (tile.hasWall) {
-      in >> tile.wallType;
-      in >> tile.hasWallColor;
-      if (tile.hasWallColor) {
-         in >> tile.wallColor;
+      if ((tile.hasColor = readBool(in))) {
+         tile.color = readUInt8(in);
       }
    }
-   in >> tile.hasLiquid;
-   if (tile.hasLiquid) {
-      in >> tile.liquidAmount;
-      in >> tile.liquidIsLava;
-      in >> tile.liquidIsHoney;
+   if ((tile.hasWall = readBool(in))) {
+      tile.wallType = readUInt8(in);
+      if ((tile.hasWallColor = readBool(in))) {
+         tile.wallColor = readUInt8(in);
+      }
    }
-   in >> tile.hasWire1;
-   in >> tile.hasWire2;
-   in >> tile.hasWire3;
-   in >> tile.isHalfBrick;
-   in >> tile.slope;
-   in >> tile.actuator;
-   in >> tile.inActive;
-   in >> tile.rle;
+   if ((tile.hasLiquid = readBool(in))) {
+      tile.liquidAmount = readUInt8(in);
+      tile.liquidIsLava = readBool(in);
+      tile.liquidIsHoney = readBool(in);
+   }
+   tile.hasWire1 = readBool(in);
+   tile.hasWire2 = readBool(in);
+   tile.hasWire3 = readBool(in);
+   tile.isHalfBrick = readBool(in);
+   tile.slope = readUInt8(in);
+   tile.actuator = readBool(in);
+   tile.inActive = readBool(in);
+   tile.rle = readUInt16(in);
 
    return tile;
+}
+
+quint8 TWorld::readUInt8(QDataStream & in) const {
+   quint8 i;
+   in >> i;
+   return i;
+}
+
+quint16 TWorld::readUInt16(QDataStream & in) const {
+   quint16 i;
+   in >> i;
+   return i;
+}
+
+quint32 TWorld::readUInt32(QDataStream & in) const {
+   quint32 i;
+   in >> i;
+   return i;
 }
 
 bool TWorld::save(QString const & filename) {
