@@ -8,6 +8,7 @@ class QDoubleSpinBox;
 class QLabel;
 class QLineEdit;
 class QSpinBox;
+class QTimeEdit;
 class TWorld;
 
 class HeaderWidget : public QWidget {
@@ -36,8 +37,7 @@ private:
    QLabel *  spawnPoint; //quint32
    QDoubleSpinBox * groundLevel;
    QDoubleSpinBox * rockLevel;
-   QDoubleSpinBox * time;
-   QCheckBox * isDayTime;
+   QTimeEdit * time;
    QSpinBox * moonPhase;
    QCheckBox * isBloodMoon;
    QCheckBox * isEclipse;

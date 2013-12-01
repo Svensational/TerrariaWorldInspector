@@ -34,13 +34,13 @@ void HeaderWidget::initGUI() {
    treeX = new QLabel();
    layout->addRow("TreeX", treeX);
 
-   treeStyle = new QLabel;
+   treeStyle = new QLabel();
    layout->addRow("Tree style", treeStyle);
 
-   caveBackX = new QLabel;
+   caveBackX = new QLabel();
    layout->addRow("Cave Back X", caveBackX);
 
-   caveBackStyle = new QLabel;
+   caveBackStyle = new QLabel();
    layout->addRow("Cave Back Style", caveBackStyle);
 
    iceBackStyle = new QSpinBox();
@@ -55,48 +55,43 @@ void HeaderWidget::initGUI() {
    ///@todo determine amount of back styles
    layout->addRow("Hell back style", hellBackStyle);
 
-   spawnPoint = new QLabel; //quint32
+   spawnPoint = new QLabel(); //quint32
    layout->addRow("Spawn point", spawnPoint);
 
-   groundLevel = new QDoubleSpinBox;
+   groundLevel = new QDoubleSpinBox();
    groundLevel->setRange(0.0, 2400.0);
    layout->addRow("Ground level", groundLevel);
 
-   rockLevel = new QDoubleSpinBox;
+   rockLevel = new QDoubleSpinBox();
    rockLevel->setRange(0.0, 2400.0);
    layout->addRow("Rock level", rockLevel);
 
-   time = new QDoubleSpinBox;
-   time->setRange(0.0, 90000.0);
-   ///@todo present time in a nicer way (no raw data)
+   time = new QTimeEdit();
    layout->addRow("Time", time);
-
-   isDayTime = new QCheckBox;
-   layout->addRow("Day time", isDayTime);
 
    moonPhase = new QSpinBox();
    ///@todo determine amount of moon phases
    layout->addRow("Moon phase", moonPhase);
 
-   isBloodMoon = new QCheckBox;
+   isBloodMoon = new QCheckBox();
    layout->addRow("Blood moon", isBloodMoon);
 
-   isEclipse = new QCheckBox;
+   isEclipse = new QCheckBox();
    layout->addRow("Eclipse", isEclipse);
 
-   dungeonPoint = new QLabel;
+   dungeonPoint = new QLabel();
    layout->addRow("Dungeon point", dungeonPoint);
 
-   isCrimson = new QCheckBox;
+   isCrimson = new QCheckBox();
    layout->addRow("Crimson", isCrimson);
 
    //std::array<bool, 14> isDefeated;
    //std::array<bool, 3> isSaved;
 
-   isShadowOrbSmashed = new QCheckBox;
+   isShadowOrbSmashed = new QCheckBox();
    layout->addRow("Shadow Orb destroyed", isShadowOrbSmashed);
 
-   isMeteorSpawned = new QCheckBox;
+   isMeteorSpawned = new QCheckBox();
    layout->addRow("Meteor spawned", isMeteorSpawned);
 
    numShadowOrbs = new QSpinBox();
@@ -107,7 +102,7 @@ void HeaderWidget::initGUI() {
    altarCount->setRange(0, 50);
    layout->addRow("Altars destroyed", altarCount);
 
-   isHardMode = new QCheckBox;
+   isHardMode = new QCheckBox();
    layout->addRow("Hard mode", isHardMode);
 
    invasionDelay = new QSpinBox();
@@ -133,7 +128,7 @@ void HeaderWidget::initGUI() {
    ///@todo determin range
    layout->addRow("Rain time", rainTime);
 
-   maxRain = new QDoubleSpinBox;
+   maxRain = new QDoubleSpinBox();
    ///@todo determin range
    layout->addRow("Max rain", maxRain);
 
@@ -159,7 +154,7 @@ void HeaderWidget::initGUI() {
    ///@todo determin range
    layout->addRow("Number of clouds", numClouds);
 
-   windSpeed = new QDoubleSpinBox;
+   windSpeed = new QDoubleSpinBox();
    ///@todo determin range
    windSpeed->setRange(-1.0, 1.0);
    windSpeed->setDecimals(5);
@@ -202,8 +197,14 @@ void HeaderWidget::update() {
                                            .arg(header.spawnPoint.y()));
    groundLevel->setValue(header.groundLevel);
    rockLevel->setValue(header.rockLevel);
-   time->setValue(header.time);
-   isDayTime->setChecked(header.isDayTime);
+
+   if (header.isDayTime) {
+      time->setTime(QTime(4, 30).addSecs(header.time));
+   }
+   else {
+      time->setTime(QTime(19, 30).addSecs(header.time));
+   }
+
    moonPhase->setValue(header.moonPhase);
    isBloodMoon->setChecked(header.isBloodMoon);
    isEclipse->setChecked(header.isEclipse);

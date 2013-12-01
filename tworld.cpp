@@ -27,6 +27,18 @@ TWorld::TWorld() :
 {
 }
 
+void TWorld::convertBlocks(quint8 find, quint8 replace) {
+   if (!valid) {
+      return;
+   }
+   QList<Tile>::iterator it;
+   for (it=tiles.begin(); it!=tiles.end(); ++it) {
+      if (it->hasBlock && it->blockType==find) {
+         it->blockType = replace;
+      }
+   }
+}
+
 void TWorld::debugOutput() const {
    int i = 0;
    QImage image(header.worldSize, QImage::Format_ARGB32);
@@ -34,8 +46,10 @@ void TWorld::debugOutput() const {
    foreach(Tile const & tile, tiles) {
       int max = i+tile.rle+1;
       for (; i<max; ++i) {
-         if (tile.isActive) {
-            image.setPixel(i/header.worldSize.height(), i%header.worldSize.height(), qRgb(255, 255, 255));
+         if (tile.hasBlock) {
+            //image.setPixel(i/header.worldSize.height(), i%header.worldSize.height(), qRgb(255, 255, 255));
+            //image.setPixel(i/header.worldSize.height(), i%header.worldSize.height(), qRgb(255-tile.blockType, 255-tile.blockType, 255-tile.blockType));
+            image.setPixel(i/header.worldSize.height(), i%header.worldSize.height(), tileLUT(tile.blockType).color.rgb());
          }
          else {
             image.setPixel(i/header.worldSize.height(), i%header.worldSize.height(), qRgb(0, 0, 0));
@@ -134,9 +148,17 @@ bool TWorld::load(QString const & filename) {
       return (valid = false);
    }
 
+   valid = true;
+   //debugOutput();
+   //convertBlocks(0, 12);
+   //header.worldName = QString("LabRat");
+   //header.time = 3600.0;   //13500.0
+   //header.isDayTime = false;
+   //debugOutput();
+
    file.close();
    emit loaded();
-   return (valid = true);
+   return valid;
 }
 
 bool TWorld::readBool(QDataStream & in) const {
@@ -304,14 +326,14 @@ QString TWorld::readString(QDataStream & in) const {
 TWorld::Tile TWorld::readTile(QDataStream & in) const {
    Tile tile;
 
-   if ((tile.isActive = readBool(in))) {
-      tile.tileType = readUInt8(in);
-      if (tileLUT(tile.tileType).hasTexCoords) {
+   if ((tile.hasBlock = readBool(in))) {
+      tile.blockType = readUInt8(in);
+      if (tileLUT(tile.blockType).hasTexCoords) {
          tile.texU = readUInt16(in);
          tile.texV = readUInt16(in);
       }
-      if ((tile.hasColor = readBool(in))) {
-         tile.color = readUInt8(in);
+      if ((tile.hasBlockColor = readBool(in))) {
+         tile.blockColor = readUInt8(in);
       }
    }
    if ((tile.hasWall = readBool(in))) {
@@ -538,16 +560,16 @@ void TWorld::write(QString const & string, QDataStream & out) const {
 }
 
 void TWorld::write(Tile const & tile, QDataStream & out) const {
-   write(tile.isActive, out);
-   if (tile.isActive) {
-      write(tile.tileType, out);
-      if (tileLUT(tile.tileType).hasTexCoords) {
+   write(tile.hasBlock, out);
+   if (tile.hasBlock) {
+      write(tile.blockType, out);
+      if (tileLUT(tile.blockType).hasTexCoords) {
          write(tile.texU, out);
          write(tile.texV, out);
       }
-      write(tile.hasColor, out);
-      if (tile.hasColor) {
-         write(tile.color, out);
+      write(tile.hasBlockColor, out);
+      if (tile.hasBlockColor) {
+         write(tile.blockColor, out);
       }
    }
    write(tile.hasWall, out);

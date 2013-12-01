@@ -35,17 +35,25 @@ void MainWindow::createCentralWidget() {
 void MainWindow::initGUI() {
    createCentralWidget();
 
-   QToolBar * toolbar = addToolBar(tr("Toolbar"));
-   QAction * openAct = new QAction(tr("&Open map"), this);
-   connect(openAct, &QAction::triggered, this, &MainWindow::loadMap);
-   toolbar->addAction(openAct);
+   QMenu * worldMenu = menuBar()->addMenu(tr("&World"));
 
-   saveAsAct = new QAction(tr("&Save map as"), this);
+   QAction * openAct = new QAction(tr("&Open"), this);
+   openAct->setShortcut(Qt::CTRL + Qt::Key_O);
+   connect(openAct, &QAction::triggered, this, &MainWindow::loadMap);
+   worldMenu->addAction(openAct);
+
+   saveAsAct = new QAction(tr("&Save as..."), this);
+   saveAsAct->setShortcut(Qt::CTRL + Qt::Key_S);
    saveAsAct->setDisabled(true);
    connect(saveAsAct, &QAction::triggered, this, &MainWindow::saveMapAs);
-   toolbar->addAction(saveAsAct);
+   worldMenu->addAction(saveAsAct);
 
-   toolbar->addSeparator();
+   worldMenu->addSeparator();
+
+   QAction * quitAct = new QAction(tr("&Quit"), this);
+   quitAct->setShortcut(Qt::CTRL + Qt::Key_Q);
+   connect(quitAct, &QAction::triggered, this, &MainWindow::close);
+   worldMenu->addAction(quitAct);
 
    setWindowTitle("Terraria World Inspector v0.9");
    //setWindowIcon(QIcon(":/items/48"));

@@ -59,12 +59,12 @@ public:
    };
 
    struct Tile {
-      bool isActive;
-       quint8 tileType;
+      bool hasBlock;
+       quint8 blockType;
         quint16 texU;
         quint16 texV;
-       bool hasColor;
-        quint8 color;
+       bool hasBlockColor;
+        quint8 blockColor;
       bool hasWall;
        quint8 wallType;
        bool hasWallColor;
@@ -117,9 +117,10 @@ public:
    bool load(QString const & filename);
    bool save(QString const & filename);
    QString getName() const;
+   Header const & getHeader() const;
+   void convertBlocks(quint8 find, quint8 replace);
 
    static QString getFolderName();
-   Header const & getHeader() const;
 
 signals:
    void loaded();
