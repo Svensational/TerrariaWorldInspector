@@ -64,7 +64,7 @@ QString TWorld::getFolderName() {
 
 #ifdef Q_OS_WIN
    WCHAR my_documents[MAX_PATH];
-   if (SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, 0, my_documents) == S_OK) {
+   if (SHGetFolderPathW(nullptr, CSIDL_PERSONAL, nullptr, 0, my_documents) == S_OK) {
       folder = QString::fromUtf16((const unsigned short *) my_documents) + "\\My Games\\Terraria\\Worlds";
    }
 #endif

@@ -4,4 +4,10 @@
         <file alias="tile">icons/tile.png</file>
         <file alias="chest">icons/chest.png</file>
     </qresource>
+    <qresource prefix="/actions">
+        <file alias="open">icons/open_16.png</file>
+        <file alias="save">icons/save_16.png</file>
+        <file alias="saveas">icons/save-as_16.png</file>
+        <file alias="refresh">icons/refresh_16.png</file>
+    </qresource>
 </RCC>

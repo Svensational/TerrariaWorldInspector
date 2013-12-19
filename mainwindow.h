@@ -14,8 +14,8 @@ public:
    ~MainWindow();
 
 private slots:
-   void loadMap();
-   void saveMapAs();
+   void loadWorld();
+   void saveWorldAs();
 
 private:
    TWorld * world;
@@ -23,6 +23,7 @@ private:
 
    void initGUI();
    void createCentralWidget();
+   void createMenu();
 };
 
 #endif // MAINWINDOW_H

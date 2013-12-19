@@ -32,20 +32,18 @@ void MainWindow::createCentralWidget() {
    setCentralWidget(tabWidget);
 }
 
-void MainWindow::initGUI() {
-   createCentralWidget();
-
+void MainWindow::createMenu() {
    QMenu * worldMenu = menuBar()->addMenu(tr("&World"));
 
-   QAction * openAct = new QAction(tr("&Open"), this);
+   QAction * openAct = new QAction(QIcon(":/actions/open"), tr("&Open"), this);
    openAct->setShortcut(Qt::CTRL + Qt::Key_O);
-   connect(openAct, &QAction::triggered, this, &MainWindow::loadMap);
+   connect(openAct, &QAction::triggered, this, &MainWindow::loadWorld);
    worldMenu->addAction(openAct);
 
-   saveAsAct = new QAction(tr("&Save as..."), this);
+   saveAsAct = new QAction(QIcon(":/actions/saveas"), tr("&Save as..."), this);
    saveAsAct->setShortcut(Qt::CTRL + Qt::Key_S);
    saveAsAct->setDisabled(true);
-   connect(saveAsAct, &QAction::triggered, this, &MainWindow::saveMapAs);
+   connect(saveAsAct, &QAction::triggered, this, &MainWindow::saveWorldAs);
    worldMenu->addAction(saveAsAct);
 
    worldMenu->addSeparator();
@@ -55,12 +53,22 @@ void MainWindow::initGUI() {
    connect(quitAct, &QAction::triggered, this, &MainWindow::close);
    worldMenu->addAction(quitAct);
 
+
+   QMenu * mapMenu = menuBar()->addMenu(tr("&Map"));
+
+   mapMenu->addSeparator();
+}
+
+void MainWindow::initGUI() {
+   createCentralWidget();
+   createMenu();
+
    setWindowTitle("Terraria World Inspector v0.9");
    //setWindowIcon(QIcon(":/items/48"));
 }
 
-void MainWindow::loadMap() {
-   QString filename = QFileDialog::getOpenFileName(this, tr("Open map"), TWorld::getFolderName(), tr("Terraria worlds (*.wld);;Terraria world backups (*.wld.bak)"));
+void MainWindow::loadWorld() {
+   QString filename = QFileDialog::getOpenFileName(this, tr("Open world"), TWorld::getFolderName(), tr("Terraria worlds (*.wld);;Terraria world backups (*.wld.bak)"));
    if (filename.isNull()) {
       return;
    }
@@ -70,8 +78,8 @@ void MainWindow::loadMap() {
    }
 }
 
-void MainWindow::saveMapAs() {
-   QString filename = QFileDialog::getSaveFileName(this, tr("Save map as..."), TWorld::getFolderName(), tr("Terraria worlds (*.wld)"));
+void MainWindow::saveWorldAs() {
+   QString filename = QFileDialog::getSaveFileName(this, tr("Save world as..."), TWorld::getFolderName(), tr("Terraria worlds (*.wld)"));
    if (filename.isNull()) {
       return;
    }

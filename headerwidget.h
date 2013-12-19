@@ -20,28 +20,38 @@ public:
 
 private:
    TWorld * world;
-
+   // general information
    QLabel * version;
    QLineEdit * worldName;
-   QLabel * worldID;
-   QLabel * worldBounds;
+   QSpinBox * worldID;
    QLabel * worldSize;
+   // wheather and time
+   QTimeEdit * time;
    QSpinBox * moonType;
+   QSpinBox * moonPhase;
+   QCheckBox * isBloodMoon;
+   QCheckBox * isEclipse;
+   QCheckBox * isRaining;
+   QSpinBox * rainTime;
+   QDoubleSpinBox * maxRain;
+   QSpinBox * cloudsActive;
+   QSpinBox * numClouds;
+   QDoubleSpinBox * windSpeed;
+   // positions
+   QLabel *  spawnPoint; //quint32
+   QDoubleSpinBox * groundLevel;
+   QDoubleSpinBox * rockLevel;
    QLabel *  treeX;
-   QLabel *  treeStyle;
    QLabel *  caveBackX;
+   QLabel * dungeonPoint;
+   // styles
+   QLabel *  treeStyle;
    QLabel *  caveBackStyle;
    QSpinBox * iceBackStyle;
    QSpinBox * jungleBackStyle;
    QSpinBox * hellBackStyle;
-   QLabel *  spawnPoint; //quint32
-   QDoubleSpinBox * groundLevel;
-   QDoubleSpinBox * rockLevel;
-   QTimeEdit * time;
-   QSpinBox * moonPhase;
-   QCheckBox * isBloodMoon;
-   QCheckBox * isEclipse;
-   QLabel * dungeonPoint;
+   //std::array<quint8, 8> styles;
+   // stuff
    QCheckBox * isCrimson;
    //std::array<bool, 14> isDefeated;
    //std::array<bool, 3> isSaved;
@@ -54,21 +64,15 @@ private:
    QSpinBox * invasionSize;
    QSpinBox * invasionType;
    QDoubleSpinBox * invasionX;
-   QCheckBox * isRaining;
-   QSpinBox * rainTime;
-   QDoubleSpinBox * maxRain;
    QSpinBox * oreTier1;
    QSpinBox * oreTier2;
    QSpinBox * oreTier3;
-   //std::array<quint8, 8> styles;
-   QSpinBox * cloudsActive;
-   QSpinBox * numClouds;
-   QDoubleSpinBox * windSpeed;
 
    void initGUI();
 
 private slots:
    void update();
+   void randomizeWorldID();
 };
 
 #endif // HEADERWIDGET_H
