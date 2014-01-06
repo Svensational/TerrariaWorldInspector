@@ -37,22 +37,21 @@ private:
    QSpinBox * cloudsActive;
    QSpinBox * numClouds;
    QDoubleSpinBox * windSpeed;
-   // positions
-   QLabel *  spawnPoint; //quint32
-   QDoubleSpinBox * groundLevel;
-   QDoubleSpinBox * rockLevel;
-   QLabel *  treeX;
-   QLabel *  caveBackX;
-   QLabel * dungeonPoint;
    // styles
    QLabel *  treeStyle;
    QLabel *  caveBackStyle;
    QSpinBox * iceBackStyle;
    QSpinBox * jungleBackStyle;
    QSpinBox * hellBackStyle;
-   //std::array<quint8, 8> styles;
-   // stuff
-   QCheckBox * isCrimson;
+   QSpinBox * BgTree;
+   QSpinBox * BgCorruption;
+   QSpinBox * BgJungle;
+   QSpinBox * BgSnow;
+   QSpinBox * BgHallow;
+   QSpinBox * BgCrimson;
+   QSpinBox * BgDesert;
+   QSpinBox * BgOcean;
+   // flags and counts
    //std::array<bool, 14> isDefeated;
    //std::array<bool, 3> isSaved;
    QCheckBox * isShadowOrbSmashed;
@@ -60,13 +59,11 @@ private:
    QSpinBox * numShadowOrbs;
    QSpinBox * altarCount;
    QCheckBox * isHardMode;
+   // invasion
    QSpinBox * invasionDelay;
    QSpinBox * invasionSize;
    QSpinBox * invasionType;
    QDoubleSpinBox * invasionX;
-   QSpinBox * oreTier1;
-   QSpinBox * oreTier2;
-   QSpinBox * oreTier3;
 
    void initGUI();
 

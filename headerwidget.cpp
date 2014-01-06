@@ -10,7 +10,20 @@ HeaderWidget::HeaderWidget(TWorld * world, QWidget * parent) :
 }
 
 void HeaderWidget::initGUI() {
+   QFrame * line;
    QFormLayout * layout = new QFormLayout();
+
+   QHBoxLayout * generalLayout = new QHBoxLayout();
+    line = new QFrame();
+     line->setFrameStyle(QFrame::HLine | QFrame::Plain);
+     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    generalLayout->addWidget(line);
+    generalLayout->addWidget(new QLabel("<b>General</b>"));
+    line = new QFrame();
+     line->setFrameStyle(QFrame::HLine | QFrame::Plain);
+     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    generalLayout->addWidget(line);
+   layout->addRow(generalLayout);
 
    version = new QLabel();
    layout->addRow("Version", version);
@@ -33,6 +46,18 @@ void HeaderWidget::initGUI() {
    worldSize = new QLabel();
    layout->addRow("Size", worldSize);
 
+
+   QHBoxLayout * TimeWeatherLayout = new QHBoxLayout();
+    line = new QFrame();
+     line->setFrameStyle(QFrame::HLine | QFrame::Plain);
+     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    TimeWeatherLayout->addWidget(line);
+    TimeWeatherLayout->addWidget(new QLabel("<b>Time & Weather</b>"));
+    line = new QFrame();
+     line->setFrameStyle(QFrame::HLine | QFrame::Plain);
+     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    TimeWeatherLayout->addWidget(line);
+   layout->addRow(TimeWeatherLayout);
 
    time = new QTimeEdit();
    layout->addRow("Time", time);
@@ -79,14 +104,20 @@ void HeaderWidget::initGUI() {
    layout->addRow("Wind speed", windSpeed);
 
 
-   treeX = new QLabel();
-   layout->addRow("TreeX", treeX);
+   QHBoxLayout * stylesLayout = new QHBoxLayout();
+    line = new QFrame();
+     line->setFrameStyle(QFrame::HLine | QFrame::Plain);
+     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    stylesLayout->addWidget(line);
+    stylesLayout->addWidget(new QLabel("<b>Styles</b>"));
+    line = new QFrame();
+     line->setFrameStyle(QFrame::HLine | QFrame::Plain);
+     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    stylesLayout->addWidget(line);
+   layout->addRow(stylesLayout);
 
    treeStyle = new QLabel();
    layout->addRow("Tree style", treeStyle);
-
-   caveBackX = new QLabel();
-   layout->addRow("Cave Back X", caveBackX);
 
    caveBackStyle = new QLabel();
    layout->addRow("Cave Back Style", caveBackStyle);
@@ -103,22 +134,51 @@ void HeaderWidget::initGUI() {
    ///@todo determine amount of back styles
    layout->addRow("Hell back style", hellBackStyle);
 
-   spawnPoint = new QLabel(); //quint32
-   layout->addRow("Spawn point", spawnPoint);
+   //std::array<quint8, 8> styles;
+   BgTree = new QSpinBox();
+   BgTree->setRange(0, 255);
+   layout->addRow("BgTree", BgTree);
 
-   groundLevel = new QDoubleSpinBox();
-   groundLevel->setRange(0.0, 2400.0);
-   layout->addRow("Ground level", groundLevel);
+   BgCorruption = new QSpinBox();
+   BgCorruption->setRange(0, 255);
+   layout->addRow("BgCorruption", BgCorruption);
 
-   rockLevel = new QDoubleSpinBox();
-   rockLevel->setRange(0.0, 2400.0);
-   layout->addRow("Rock level", rockLevel);
+   BgJungle = new QSpinBox();
+   BgJungle->setRange(0, 255);
+   layout->addRow("BgJungle", BgJungle);
 
-   dungeonPoint = new QLabel();
-   layout->addRow("Dungeon point", dungeonPoint);
+   BgSnow = new QSpinBox();
+   BgSnow->setRange(0, 255);
+   layout->addRow("BgSnow", BgSnow);
 
-   isCrimson = new QCheckBox();
-   layout->addRow("Crimson", isCrimson);
+   BgHallow = new QSpinBox();
+   BgHallow->setRange(0, 255);
+   layout->addRow("BgHallow", BgHallow);
+
+   BgCrimson = new QSpinBox();
+   BgCrimson->setRange(0, 255);
+   layout->addRow("BgCrimson", BgCrimson);
+
+   BgDesert = new QSpinBox();
+   BgDesert->setRange(0, 255);
+   layout->addRow("BgDesert", BgDesert);
+
+   BgOcean = new QSpinBox();
+   BgOcean->setRange(0, 255);
+   layout->addRow("BgOcean", BgOcean);
+
+
+   QHBoxLayout * flagsLayout = new QHBoxLayout();
+    line = new QFrame();
+     line->setFrameStyle(QFrame::HLine | QFrame::Plain);
+     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    flagsLayout->addWidget(line);
+    flagsLayout->addWidget(new QLabel("<b>Flags & Counts</b>"));
+    line = new QFrame();
+     line->setFrameStyle(QFrame::HLine | QFrame::Plain);
+     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    flagsLayout->addWidget(line);
+   layout->addRow(flagsLayout);
 
    //std::array<bool, 14> isDefeated;
    //std::array<bool, 3> isSaved;
@@ -140,6 +200,19 @@ void HeaderWidget::initGUI() {
    isHardMode = new QCheckBox();
    layout->addRow("Hard mode", isHardMode);
 
+
+   QHBoxLayout * invasionLayout = new QHBoxLayout();
+    line = new QFrame();
+     line->setFrameStyle(QFrame::HLine | QFrame::Plain);
+     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    invasionLayout->addWidget(line);
+    invasionLayout->addWidget(new QLabel("<b>Invasion</b>"));
+    line = new QFrame();
+     line->setFrameStyle(QFrame::HLine | QFrame::Plain);
+     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    invasionLayout->addWidget(line);
+   layout->addRow(invasionLayout);
+
    invasionDelay = new QSpinBox();
    ///@todo determin range
    layout->addRow("Invasion delay", invasionDelay);
@@ -153,22 +226,8 @@ void HeaderWidget::initGUI() {
    layout->addRow("Invasion type", invasionType);
 
    invasionX = new QDoubleSpinBox;
-   invasionX->setRange(0, 8400);
+   invasionX->setRange(0.0, 8400.0);
    layout->addRow("Invasion X", invasionX);
-
-   oreTier1 = new QSpinBox();
-   ///@todo determin range
-   layout->addRow("Ore tier 1", oreTier1);
-
-   oreTier2 = new QSpinBox();
-   ///@todo determin range
-   layout->addRow("Ore tier 2", oreTier2);
-
-   oreTier3 = new QSpinBox();
-   ///@todo determin range
-   layout->addRow("Ore tier 3", oreTier3);
-
-   //std::array<quint8, 8> styles;
 
    setLayout(layout);
 }
@@ -183,21 +242,14 @@ void HeaderWidget::update() {
 
    version->setText(QString("%1").arg(header.version));
    worldName->setText(header.worldName);
-   //worldID->setText(QString("%1").arg(header.worldID));
    worldID->setValue(header.worldID);
    worldSize->setText(QString("%1x%2 blocks").arg(header.worldSize.width())
-                                      .arg(header.worldSize.height()));
+                                             .arg(header.worldSize.height()));
    moonType->setValue(header.moonType);
-   treeX->setText(QString("%1, %2, %3").arg(header.treeX[0])
-                                       .arg(header.treeX[1])
-                                       .arg(header.treeX[2]));
    treeStyle->setText(QString("%1, %2, %3, %4").arg(header.treeStyle[0])
                                                .arg(header.treeStyle[1])
                                                .arg(header.treeStyle[2])
                                                .arg(header.treeStyle[3]));
-   caveBackX->setText(QString("%1, %2, %3").arg(header.caveBackX[0])
-                                           .arg(header.caveBackX[1])
-                                           .arg(header.caveBackX[2]));
    caveBackStyle->setText(QString("%1, %2, %3, %4").arg(header.caveBackStyle[0])
                                                    .arg(header.caveBackStyle[1])
                                                    .arg(header.caveBackStyle[2])
@@ -205,10 +257,15 @@ void HeaderWidget::update() {
    iceBackStyle->setValue(header.iceBackStyle);
    jungleBackStyle->setValue(header.jungleBackStyle);
    hellBackStyle->setValue(header.hellBackStyle);
-   spawnPoint->setText(QString("(%1 / %2)").arg(header.spawnPoint.x())
-                                           .arg(header.spawnPoint.y()));
-   groundLevel->setValue(header.groundLevel);
-   rockLevel->setValue(header.rockLevel);
+   BgTree->setValue(header.styles[0]);
+   BgCorruption->setValue(header.styles[1]);
+   BgJungle->setValue(header.styles[2]);
+   BgSnow->setValue(header.styles[3]);
+   BgHallow->setValue(header.styles[4]);
+   BgCrimson->setValue(header.styles[5]);
+   BgDesert->setValue(header.styles[6]);
+   BgOcean->setValue(header.styles[7]);
+
 
    if (header.isDayTime) {
       time->setTime(QTime(4, 30).addSecs(header.time));
@@ -220,9 +277,6 @@ void HeaderWidget::update() {
    moonPhase->setValue(header.moonPhase);
    isBloodMoon->setChecked(header.isBloodMoon);
    isEclipse->setChecked(header.isEclipse);
-   dungeonPoint->setText(QString("(%1 / %2)").arg(header.dungeonPoint.x())
-                                             .arg(header.dungeonPoint.y()));
-   isCrimson->setChecked(header.isCrimson);
    isShadowOrbSmashed->setChecked(header.isShadowOrbSmashed);
    isMeteorSpawned->setChecked(header.isMeteorSpawned);
    numShadowOrbs->setValue(header.numShadowOrbs);
@@ -235,9 +289,6 @@ void HeaderWidget::update() {
    isRaining->setChecked(header.isRaining);
    rainTime->setValue(header.rainTime);
    maxRain->setValue(header.maxRain);
-   oreTier1->setValue(header.oreTier[0]);
-   oreTier2->setValue(header.oreTier[1]);
-   oreTier3->setValue(header.oreTier[2]);
    cloudsActive->setValue(header.cloudsActive);
    numClouds->setValue(header.numClouds);
    windSpeed->setValue(header.windSpeed);
